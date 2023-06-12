@@ -104,7 +104,7 @@ const handleErrors = (vis, res, options) => {
           label: 'Gauge Colors',
           type: 'array',
           display: 'colors',
-          default: ["#FF3333", "#9C33FF", "#33C4FF"]
+          default: ["#D82C59", "#963CBD", "#100695", "#00C1D5"]
         },
        scale_start: {
          section: 'Gauge',
