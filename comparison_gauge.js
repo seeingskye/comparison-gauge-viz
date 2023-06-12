@@ -243,7 +243,7 @@ const handleErrors = (vis, res, options) => {
         const scaleTextSize = getConfigValue('scale_text_size');
         const labelTextSize = getConfigValue('label_text_size');
         const compareTextSize = getConfigValue('compare_text_size');
-        console.log('config');
+        console.log(config);
         console.log(getConfigValue('gauge_colors'));
         const gaugeColor = d3.interpolateRgbBasis(getConfigValue('gauge_colors'));
         const bodyRadius = 120;
