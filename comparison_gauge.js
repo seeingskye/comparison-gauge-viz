@@ -62,7 +62,6 @@ const handleErrors = (vis, res, options) => {
         cell: cell
       }
     })
-    console.log(dataCells)
     return dataCells
   }
   
@@ -74,6 +73,7 @@ const handleErrors = (vis, res, options) => {
      options: {
        gauge_sweep: {
          section: 'Gauge',
+         order: 1,
          label: 'Gauge Sweep (degrees)',
          type: 'number',
          display: 'range',
@@ -84,12 +84,14 @@ const handleErrors = (vis, res, options) => {
        },
        has_body: {
          section: 'Gauge',
+         order: 2,
          label: 'Body Background Visible?',
          type: 'boolean',
          default: true
        },
        scale_start: {
          section: 'Gauge',
+         order: 3,
          label: 'Scale Start',
          type: 'number',
          display: 'number',
@@ -97,6 +99,7 @@ const handleErrors = (vis, res, options) => {
        },
        scale_end: {
          section: 'Gauge',
+         order: 4,
          label: 'Scale End',
          type: 'number',
          display: 'number',
@@ -104,15 +107,24 @@ const handleErrors = (vis, res, options) => {
        },
        scale_increment: {
          section: 'Gauge',
+         order: 5,
          label: 'Scale Step',
          type: 'number',
          display: 'number',
          default: 1
        },
+       has_comparison: {
+         section: 'Gauge',
+         order: 6,
+         label: 'Show Comparison?',
+         type: 'boolean',
+         default: true
+        },
   
        
        field_name_position: {
         section: 'Labels',
+        order: 1,
         label: 'Field Name Position',
         type: 'string',
         display: 'radio',
@@ -122,20 +134,16 @@ const handleErrors = (vis, res, options) => {
         ],
         default: 'above'
       },
-      has_comparison: {
-        section: 'Labels',
-        label: 'Show Comparison?',
-        type: 'boolean',
-        default: true
-       },
        comparison_text: {
         section: 'Labels',
+        order: 2,
         label: 'Comparison Text',
         type: 'string',
         default: "Rating Change"
        },
        compare_text_size: {
         section: 'Labels',
+        order: 3,
         label: 'Comparison Font Size',
         type: 'number',
         display: 'number',
@@ -143,6 +151,7 @@ const handleErrors = (vis, res, options) => {
        },
        value_text_size: {
         section: 'Labels',
+        order: 4,
         label: 'Value Font Size',
         type: 'number',
         display: 'number',
@@ -150,6 +159,7 @@ const handleErrors = (vis, res, options) => {
        },
        label_text_size: {
         section: 'Labels',
+        order: 5,
         label: 'Label Font Size',
         type: 'number',
         display: 'number',
@@ -157,6 +167,7 @@ const handleErrors = (vis, res, options) => {
        },
        scale_text_size: {
         section: 'Labels',
+        order: 6,
         label: 'Scale Font Size',
         type: 'number',
         display: 'number',
@@ -183,8 +194,9 @@ const handleErrors = (vis, res, options) => {
            min_measures: 2, max_measures: 3
         })) return
   
-        const fields = formatFields(queryResponse)
+        const fields = formatFields(queryResponse);
         const dataCells = processData(data, fields);
+
         const getConfigValue = (configName) => {
           const value = ((config && config[configName]) || this.options[configName]['default']);
           return value
@@ -195,9 +207,24 @@ const handleErrors = (vis, res, options) => {
         const hasBody = getConfigValue('has_body');
         const scaleStart = getConfigValue('scale_start');
         const scaleEnd = getConfigValue('scale_end');
+        if (scaleEnd - scaleStart <= 0) {
+          vis.addError({
+            title: `Scale Length is not Positive`,
+            message: `This visualization's Scale Start number minus the Scale End number must be a positive number. Change this in the configs.`
+          })
+          return
+        }
         const scaleIncrement = getConfigValue('scale_increment');
+        if (scaleIncrement <= 0) {
+          vis.addError({
+            title: `Scale Step is not Positive`,
+            message: `This visualization requires a positive number for the Scale Step config`
+          })
+          return
+        }
         const fieldNamePosition = getConfigValue('field_name_position');
         const hasComparison = getConfigValue('has_comparison');
+        console.log(hasComparison);
         const comparisonText = getConfigValue('comparison_text');
         const valueTextSize = getConfigValue('value_text_size');
         const scaleTextSize = getConfigValue('scale_text_size');
@@ -437,7 +464,7 @@ const handleErrors = (vis, res, options) => {
            .style('font-family', "'Open Sans', Helvetica, sans-serif")
            .style('font-weight', "bold")
            .style('font-size', valueTextSize + 'px')
-           .text((d) => `${d.value}`)
+           .text((d) => `${d.html}`)
            .attr('dominant-baseline', "central")
            .attr('text-anchor', "middle")
            .attr('dy', (d, i, nodes) => {
