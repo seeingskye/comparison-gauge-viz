@@ -113,7 +113,7 @@ const handleErrors = (vis, res, options) => {
          label: 'Scale Start',
          type: 'number',
          display: 'number',
-         default: 0
+         default: 1
        },
        scale_end: {
          section: 'Gauge',
