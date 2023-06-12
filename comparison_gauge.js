@@ -191,7 +191,6 @@ const handleErrors = (vis, res, options) => {
      **/
       updateAsync: function(data, element, config, queryResponse, details, doneRendering){
         
-        console.log(config);
         if (!handleErrors(this, queryResponse, {
            min_pivots: 0, max_pivots: 0,
            min_dimensions: 0, max_dimensions: 1,
@@ -202,7 +201,7 @@ const handleErrors = (vis, res, options) => {
         const dataCells = processData(data, fields);
 
         const getConfigValue = (configName) => {
-          const value = ((config && config[configName]) || this.options[configName]['default']);
+          const value = (config && config[configName] === null) ? this.options[configName]['default'] : config[configName];
           return value
         }
   
@@ -353,7 +352,7 @@ const handleErrors = (vis, res, options) => {
    
          // Gauge Mask
          const gaugeMask = nodeEnter.append('mask')
-           .attr('id', d => `gaugeMask${d.row}`)
+           .attr('id', d => `gaugeMask${d.fieldName}`)
            .attr('height', bodyRadius*2)
            .attr('width', bodyRadius*2)
            .attr('x', -bodyRadius)
@@ -374,7 +373,7 @@ const handleErrors = (vis, res, options) => {
          
          // Gauge (colored pips + mask)
          const colorPip = nodeEnter.append('g')
-           .attr('mask',d => `url(#gaugeMask${d.row})`)
+           .attr('mask',d => `url(#gaugeMask${d.fieldName})`)
          
          for(let i = 0; i < pipCount; i++) {
            pipOffset = (pipBorderArcLength + pipArcLength) * i;
