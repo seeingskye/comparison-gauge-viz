@@ -73,27 +73,43 @@ const handleErrors = (vis, res, options) => {
      * panel but here, you can just manually set your default values in the code.
      **/
      options: {
-       gauge_sweep: {
-         section: 'Gauge',
-         order: 1,
-         label: 'Gauge Sweep (degrees)',
-         type: 'number',
-         display: 'range',
-         default: 180,
-         min: 90,
-         max: 360,
-         step: 5
-       },
        has_body: {
          section: 'Gauge',
-         order: 2,
+         order: 1,
          label: 'Body Background Visible?',
          type: 'boolean',
          default: true
        },
+       has_comparison: {
+         section: 'Gauge',
+         order: 2,
+         label: 'Show Comparison?',
+         type: 'boolean',
+         default: true
+        },
+        gauge_sweep: {
+          section: 'Gauge',
+          order: 3,
+          label: 'Gauge Sweep (degrees)',
+          type: 'number',
+          display: 'range',
+          default: 180,
+          min: 90,
+          max: 360,
+          step: 5
+        },
+        gauge_colors: {
+          section: 'Gauge',
+          order: 4,
+          label: 'Gauge Colors',
+          type: 'array',
+          display: 'colors',
+          default: ["#FF3333", "#9C33FF", "#33C4FF"]
+        },
        scale_start: {
          section: 'Gauge',
-         order: 3,
+         order: 5,
+         display_size: 'third',
          label: 'Scale Start',
          type: 'number',
          display: 'number',
@@ -101,7 +117,8 @@ const handleErrors = (vis, res, options) => {
        },
        scale_end: {
          section: 'Gauge',
-         order: 4,
+         order: 6,
+         display_size: 'third',
          label: 'Scale End',
          type: 'number',
          display: 'number',
@@ -109,19 +126,13 @@ const handleErrors = (vis, res, options) => {
        },
        scale_increment: {
          section: 'Gauge',
-         order: 5,
+         order: 7,
+         display_size: 'third',
          label: 'Scale Step',
          type: 'number',
          display: 'number',
          default: 1
        },
-       has_comparison: {
-         section: 'Gauge',
-         order: 6,
-         label: 'Show Comparison?',
-         type: 'boolean',
-         default: true
-        },
   
        
        field_name_position: {
@@ -141,7 +152,7 @@ const handleErrors = (vis, res, options) => {
         order: 2,
         label: 'Comparison Text',
         type: 'string',
-        default: "Rating Change"
+        default: "Change"
        },
        compare_text_size: {
         section: 'Labels',
@@ -232,6 +243,9 @@ const handleErrors = (vis, res, options) => {
         const scaleTextSize = getConfigValue('scale_text_size');
         const labelTextSize = getConfigValue('label_text_size');
         const compareTextSize = getConfigValue('compare_text_size');
+        console.log('config');
+        console.log(getConfigValue('gauge_colors'));
+        const gaugeColor = d3.interpolateRgbBasis(getConfigValue('gauge_colors'));
         const bodyRadius = 120;
         const gaugeWidthPercent = .4;
         const bodyStrokeWidth = 14;
@@ -266,7 +280,6 @@ const handleErrors = (vis, res, options) => {
         const bodyStrokeColor = 'hsl(250, 20%, 96%)';
         const bodyFillColor = 'hsl(250, 20%, 99%)';
         // Pips
-        const gaugeColor = d3.interpolateRgbBasis(["red", "purple", "blue"]);
         const emptyPipColor = hasBody ? 'hsl(250, 20%, 90%)' : 'hsl(250, 20%, 97%)';
         const gaugeWidth = bodyRadius * gaugeWidthPercent;
         const gaugeRadius = bodyRadius - (gaugeWidth/2) - (bodyStrokeWidth/2) + .5;
