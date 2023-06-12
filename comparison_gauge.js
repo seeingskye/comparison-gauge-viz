@@ -210,7 +210,7 @@ const handleErrors = (vis, res, options) => {
   
         const fields = formatFields(queryResponse);
         const dataCells = processData(data, fields);
-
+    
         const getConfigValue = (configName) => {
           const value = (config && config[configName] === null) ? this.options[configName]['default'] : config[configName];
           return value
@@ -283,7 +283,8 @@ const handleErrors = (vis, res, options) => {
         const emptyPipColor = hasBody ? 'hsl(250, 20%, 90%)' : 'hsl(250, 20%, 97%)';
         const gaugeWidth = bodyRadius * gaugeWidthPercent;
         const gaugeRadius = bodyRadius - (gaugeWidth/2) - (bodyStrokeWidth/2) + .5;
-        const pipCount = (scaleEnd - scaleStart) / scaleIncrement;
+        let pipCount = (scaleEnd - scaleStart) / scaleIncrement;
+        pipCount = pipCount < 1 ? 1 : pipCount;
         const pipBorderArcLength = 2;
         // Gauge Markers
         const markerStartRadius = gaugeRadius - gaugeWidth/2;
