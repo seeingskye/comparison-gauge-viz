@@ -193,7 +193,7 @@ const visObject = {
 
       // CONFIGS
       const gaugeSweep = getConfigValue('gauge_sweep');
-      const hasBody = getConfigValue('has_Body');
+      const hasBody = getConfigValue('has_body');
       const scaleStart = getConfigValue('scale_start');
       const scaleEnd = getConfigValue('scale_end');
       const scaleIncrement = getConfigValue('scale_increment');
