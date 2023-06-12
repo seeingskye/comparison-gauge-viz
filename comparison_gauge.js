@@ -7,6 +7,7 @@
  **/
 
 const handleErrors = (vis, res, options) => {
+  // TODO: Validate measure types & allow for either multi dimension or multi measure
 
   const check = (group, noun, count, min, max) => {
     if (!vis.addError || !vis.clearErrors) return false
@@ -37,24 +38,129 @@ const handleErrors = (vis, res, options) => {
    && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures))
 }
 
+// Create obj to lookup field details by name
+const formatFields = (responseObj) => {
+  const rawFields = responseObj.dimension_like.concat(responseObj.measure_like);
+  const fieldsArray = rawFields.map((field) => [field.name, field]);
+  const fields = Object.fromEntries(fieldsArray);
+  return fields
+}
+
+const processData = (dataTable, fields) => {
+  // Only need the first row of data
+  dataEntries = dataTable[0].entries()
+  dataCells = dataEntries.map(([name, cell]) => {
+    const value = fields[name].is_numeric ? cell.value : LookerCharts.Utils.textForCell(cell);
+
+    return {
+      fieldName: name,
+      label: fields[name].label,
+      shortLabel: fields[name].label_short,
+      value: value,
+      html: LookerCharts.Utils.htmlForCell(cell),
+      cell: cell
+    }
+  })
+
+  return dataCells
+}
+
 const visObject = {
   /**
    * Configuration options for your visualization. In Looker, these show up in the vis editor
    * panel but here, you can just manually set your default values in the code.
    **/
    options: {
-     first_node_color: {
-       label: 'First Node Color',
-       default: '#36c1b3',
-       type: 'string',
-       display: 'color'
+     gauge_sweep: {
+       section: 'Gauge',
+       label: 'Gauge Sweep (degrees)',
+       type: 'number',
+       display: 'range',
+       default: 180,
+       min: 90,
+       max: 360,
+       step: 5
      },
-     second_node_color: {
-       label: 'Second Node Color',
-       default: '#702963',
-       type: 'string',
-       display: 'color'
-     }
+     has_body: {
+       section: 'Gauge',
+       label: 'Body Background Visible?',
+       type: 'boolean',
+       default: true
+     },
+     scale_start: {
+       section: 'Gauge',
+       label: 'Scale Start',
+       type: 'number',
+       display: 'number',
+       default: 0
+     },
+     scale_end: {
+       section: 'Gauge',
+       label: 'Scale End',
+       type: 'number',
+       display: 'number',
+       default: 10
+     },
+     scale_increment: {
+       section: 'Gauge',
+       label: 'Scale Step',
+       type: 'number',
+       display: 'number',
+       default: 1
+     },
+
+     
+     field_name_position: {
+      section: 'Labels',
+      label: 'Field Name Position',
+      type: 'string',
+      display: 'radio',
+      values: [
+       {'Above': 'above'},
+       {'Below': 'below'}
+      ],
+      default: 'above'
+    },
+    has_comparison: {
+      section: 'Labels',
+      label: 'Show Comparison?',
+      type: 'boolean',
+      default: true
+     },
+     comparison_text: {
+      section: 'Labels',
+      label: 'Comparison Text',
+      type: 'string',
+      default: "Rating Change"
+     },
+     comparison_font_size: {
+      section: 'Labels',
+      label: 'Comparison Font Size',
+      type: 'number',
+      display: 'number',
+      default: 20
+     },
+     value_font_size: {
+      section: 'Labels',
+      label: 'Value Font Size',
+      type: 'number',
+      display: 'number',
+      default: 40
+     },
+     label_text_size: {
+      section: 'Labels',
+      label: 'Label Font Size',
+      type: 'number',
+      display: 'number',
+      default: 28
+     },
+     scale_text_size: {
+      section: 'Labels',
+      label: 'Scale Font Size',
+      type: 'number',
+      display: 'number',
+      default: 18
+     },
    },
   
   /**
@@ -72,44 +178,35 @@ const visObject = {
     updateAsync: function(data, element, config, queryResponse, details, doneRendering){
       if (!handleErrors(this, queryResponse, {
          min_pivots: 0, max_pivots: 0,
-         min_dimensions: 1, max_dimensions: undefined,
-         min_measures: 0, max_measures: undefined
+         min_dimensions: 0, max_dimensions: 1,
+         min_measures: 2, max_measures: 3
       })) return
 
-      const cellData = [{
-          field_name: "First Rating",
-          value: 8.6,
-          row: 1
-        }, {
-          field_name: "Last Rating",
-          value: 9.0,
-          row: 2
-        }]
+      const dataCells = processData(data, queryResponse.fields.measure_like);
    
-      let i = 0
-      const nodeColors = {
-        1: (config && config.first_node_color) || this.options.first_node_color.default,
-        2: (config && config.second_node_color) || this.options.second_node_color.default
+      const getConfigValue = (configName) => {
+        const value = ((config && config[configName]) || this.options[configName].default);
+        return value
       }
 
       // CONFIGS
+      const gaugeSweep = getConfigValue('gauge_sweep');
+      const hasBody = getConfigValue('has_Body');
+      const scaleStart = getConfigValue('scale_start');
+      const scaleEnd = getConfigValue('scale_end');
+      const scaleIncrement = getConfigValue('scale_increment');
+      const fieldNamePosition = getConfigValue('field_name_position');
+      const hasComparison = getConfigValue('has_comparison');
+      const comparisonText = getConfigValue('comparison_text');
+      const valueTextSize = getConfigValue('value_text_size');
+      const scaleTextSize = getConfigValue('scale_text_size');
+      const labelTextSize = getConfigValue('label_text_size');
+      const compareTextSize = getConfigValue('compare_text_size');
       const bodyRadius = 120;
       const gaugeWidthPercent = .4;
-      const gaugeSweep = 180; // degrees
-      const hasBody = false;
       const bodyStrokeWidth = 14;
-      const scaleStart = 0;
-      const scaleEnd = 10;
-      const scaleIncrement = 1;
-      const fieldNamePosition = "above";
-      const hasComparison = true;
       const labelAdjustDy = 60;
-      const comparisonText = "Rating Change";
       const comparisonSignificance = 1;
-      const valueTextSize = 40;
-      const scaleTextSize = 18;
-      const labelTextSize = 28;
-      const compareTextSize = 20;
       const nodeGap = 100;
 
       const pathTriangle =  `
@@ -180,7 +277,7 @@ const visObject = {
       const pipDashoffset = `${pipArcLength}, ${pipBorderArcLength}, `.repeat(pipCount) + `0, ${gaugeSweepGap}`;
        
         // Set gauge length per node, accounts for pip gaps
-      cellData.forEach((d, i, cellData) => {
+      dataCells.forEach((d, i, cellData) => {
         let value = d.value - scaleStart;
         value = value < 0 ? 0 : value;
         const pipIndex = Math.floor(value/scaleIncrement);
@@ -373,8 +470,8 @@ const visObject = {
 
       // Comparison
       const appendComparison = (node) => {
-        const firstValue = new BigNumber(cellData[0].value);
-        const secondValue = new BigNumber(cellData[1].value);
+        const firstValue = new BigNumber(dataCells[0].value);
+        const secondValue = new BigNumber(dataCells[1].value);
         const valueDifference = secondValue.minus(firstValue);
         const compareX = width/2 - compareTextSize/2;
         const compareNodeOffsetY = fieldNamePosition === 'above' ? textLabelConfig.below : textLabelConfig.above;
