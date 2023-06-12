@@ -38,12 +38,13 @@ const handleErrors = (vis, res, options) => {
      && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures))
   }
   
-  // Create obj to lookup field details by name
   const formatFields = (responseObj) => {
+    // Create obj to lookup field details by name
     const rawFields = responseObj.fields;
     const combinedFields = rawFields.dimension_like.concat(rawFields.measure_like);
     const fieldsArray = combinedFields.map((field) => [field.name, field]);
     const fields = Object.fromEntries(fieldsArray);
+
     return fields
   }
   
@@ -58,6 +59,7 @@ const handleErrors = (vis, res, options) => {
         label: fields[name].label,
         shortLabel: fields[name].label_short,
         value: value,
+        text: LookerCharts.Utils.textForCell(cell),
         html: LookerCharts.Utils.htmlForCell(cell),
         cell: cell
       }
@@ -464,7 +466,7 @@ const handleErrors = (vis, res, options) => {
            .style('font-family', "'Open Sans', Helvetica, sans-serif")
            .style('font-weight', "bold")
            .style('font-size', valueTextSize + 'px')
-           .text((d) => `${d.html}`)
+           .text((d) => `${d.text}`)
            .attr('dominant-baseline', "central")
            .attr('text-anchor', "middle")
            .attr('dy', (d, i, nodes) => {
