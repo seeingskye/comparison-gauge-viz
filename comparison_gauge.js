@@ -40,8 +40,9 @@ const handleErrors = (vis, res, options) => {
 
 // Create obj to lookup field details by name
 const formatFields = (responseObj) => {
-  const rawFields = responseObj.dimension_like.concat(responseObj.measure_like);
-  const fieldsArray = rawFields.map((field) => [field.name, field]);
+  const rawFields = responseObj.fields;
+  const combinedFields = rawFields.dimension_like.concat(rawFields.measure_like);
+  const fieldsArray = combinedFields.map((field) => [field.name, field]);
   const fields = Object.fromEntries(fieldsArray);
   return fields
 }
