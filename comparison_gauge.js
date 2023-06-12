@@ -190,6 +190,8 @@ const handleErrors = (vis, res, options) => {
      * the data and should update the visualization with the new data.
      **/
       updateAsync: function(data, element, config, queryResponse, details, doneRendering){
+        
+        console.log(config);
         if (!handleErrors(this, queryResponse, {
            min_pivots: 0, max_pivots: 0,
            min_dimensions: 0, max_dimensions: 1,
@@ -226,7 +228,6 @@ const handleErrors = (vis, res, options) => {
         }
         const fieldNamePosition = getConfigValue('field_name_position');
         const hasComparison = getConfigValue('has_comparison');
-        console.log(hasComparison);
         const comparisonText = getConfigValue('comparison_text');
         const valueTextSize = getConfigValue('value_text_size');
         const scaleTextSize = getConfigValue('scale_text_size');
