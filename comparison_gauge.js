@@ -212,7 +212,7 @@ const handleErrors = (vis, res, options) => {
         const dataCells = processData(data, fields);
     
         const getConfigValue = (configName) => {
-          const value = (config && config[configName] === null) ? this.options[configName]['default'] : config[configName];
+          const value = (config && config[configName] !== null) ? config[configName] : this.options[configName]['default'];
           return value
         }
   
