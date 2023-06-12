@@ -48,7 +48,7 @@ const formatFields = (responseObj) => {
 
 const processData = (dataTable, fields) => {
   // Only need the first row of data
-  dataEntries = dataTable[0].entries()
+  dataEntries = Object.entries(dataTable[0]);
   dataCells = dataEntries.map(([name, cell]) => {
     const value = fields[name].is_numeric ? cell.value : LookerCharts.Utils.textForCell(cell);
 
@@ -182,7 +182,8 @@ const visObject = {
          min_measures: 2, max_measures: 3
       })) return
 
-      const dataCells = processData(data, queryResponse.fields.measure_like);
+      const fields = formatFields(queryResponse)
+      const dataCells = processData(data, fields);
    
       const getConfigValue = (configName) => {
         const value = ((config && config[configName]) || this.options[configName].default);
