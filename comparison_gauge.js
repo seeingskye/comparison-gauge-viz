@@ -212,7 +212,7 @@ const handleErrors = (vis, res, options) => {
         const dataCells = processData(data, fields);
     
         const getConfigValue = (configName) => {
-          const value = (config && config[configName] !== null) ? config[configName] : this.options[configName]['default'];
+          const value = (config && config[configName] != undefined) ? config[configName] : this.options[configName]['default'];
           return value
         }
   
@@ -243,8 +243,6 @@ const handleErrors = (vis, res, options) => {
         const scaleTextSize = getConfigValue('scale_text_size');
         const labelTextSize = getConfigValue('label_text_size');
         const compareTextSize = getConfigValue('compare_text_size');
-        console.log(config);
-        console.log(getConfigValue('gauge_colors'));
         const gaugeColor = d3.interpolateRgbBasis(getConfigValue('gauge_colors'));
         const bodyRadius = 120;
         const gaugeWidthPercent = .4;
