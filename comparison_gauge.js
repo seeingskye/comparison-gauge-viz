@@ -201,7 +201,7 @@ const handleErrors = (vis, res, options) => {
      * the data and should update the visualization with the new data.
      **/
       updateAsync: function(data, element, config, queryResponse, details, doneRendering){
-        
+        this.clearErrors();
         if (!handleErrors(this, queryResponse, {
            min_pivots: 0, max_pivots: 0,
            min_dimensions: 0, max_dimensions: 1,
@@ -566,7 +566,8 @@ const handleErrors = (vis, res, options) => {
            .attr('height', element.clientHeight)
            .attr('viewBox', `${viewBox.x}, ${viewBox.y}, ${viewBox.width}, ${viewBox.height}`)
            .attr('preserveAspectRatio', "xMidYMid meet")
-         
+
+          done();
        }
    };
    
