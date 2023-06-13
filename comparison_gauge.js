@@ -567,7 +567,7 @@ const handleErrors = (vis, res, options) => {
            .attr('viewBox', `${viewBox.x}, ${viewBox.y}, ${viewBox.width}, ${viewBox.height}`)
            .attr('preserveAspectRatio', "xMidYMid meet")
 
-          done();
+           doneRendering();
        }
    };
    
